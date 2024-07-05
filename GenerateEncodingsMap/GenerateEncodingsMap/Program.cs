@@ -136,7 +136,10 @@ public static class Program
     {
         Directory.CreateDirectory(where);
         var builder = new StringBuilder();
-        builder.AppendLine("<!doctype html>\r\n<html> <head> <style> iframe { \tborder: none; \tmargin: 0; \tpadding: 0; width: 100%; } </style> </head> <body>\r\n");
+        builder.AppendLine("<!doctype html>\r\n<html> <head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=\"utf-8\"> \r\n<style> iframe { \tborder: none; \tmargin: 0; \tpadding: 0; width: 100%; } </style></head> <body>\r\n");
+        builder.AppendLine("<h1>Overview</h1>");
+        builder.AppendLine("Tests show the UTF-8-based mapping on the first line, then test the encoding via a meta charset style declaration in an iframe following. The two should generally match.");
+        builder.AppendLine("Known caveats: &lt; is skipped, apparent but OK mismatches will appear when the UTF-8 displays the codepoint in a box but the encoding displays only the diamond, and multi-character and UTF-16-based variants don't display the test correctly.");
         foreach (var mappedEncoding in mappedEncodings)
         {
             builder.AppendLine("<hr />");
@@ -170,7 +173,7 @@ public static class Program
     private static byte[] GenerateActualOutput(MappedEncoding mappedEncoding)
     {
         var encoding = Encoding.GetEncoding(mappedEncoding.dotnet_name);
-        var header = $"<!doctype html>\r\n<html><head><style> body {{ margin: 0; padding: 0; }} </style><meta charset=\"{mappedEncoding.name}\"></head>\r\n<body>";
+        var header = $"<!doctype html>\r\n<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset={mappedEncoding.name}\">\r\n<style> body {{ margin: 0; padding: 0; }} </style></head>\r\n<body>";
         var outputBytes = encoding.GetBytes(header).ToList();
         for(int i=0; i<mappedEncoding.bytesForCodePoints.Count; i++)
         {
