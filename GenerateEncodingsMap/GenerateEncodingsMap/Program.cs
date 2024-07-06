@@ -32,10 +32,10 @@ public static class Program
                 new string[]
                 {
                     dotnetEncodingInfo.Name,
-                    dotnetEncoding.EncodingName,
-                    dotnetEncoding.BodyName,
-                    dotnetEncoding.HeaderName,
-                    dotnetEncoding.WebName
+                    dotnetEncoding.EncodingName
+                    //dotnetEncoding.BodyName
+                    //dotnetEncoding.HeaderName
+                    //dotnetEncoding.WebName /*Causes some double-hits on not-quite-matches like iso-8859-2 falsely matching to .NET windows-1250 */
                 }.Select(s=>s.ToLowerInvariant())));
             //Debug.WriteLine(dotnetEncoding.EncodingName);
         }
@@ -43,6 +43,16 @@ public static class Program
         //Now match them up
         foreach(var mdnAlias in mdnAliases)
         {
+            var allDotNetMatches = dotnetAliases.Where(dna => mdnAlias.Aliases.Intersect(dna.Aliases).Any()).ToList();
+            if(allDotNetMatches.Count > 1)
+            {
+                Console.WriteLine($"WARNING! More than one match for {mdnAlias.CanonicalName}. MDN aliases: {string.Join(",", mdnAlias.Aliases)}");
+                for(int i=0; i<allDotNetMatches.Count; i++)
+                {
+                    Console.WriteLine($"{i}: .NET aliases {string.Join(",", allDotNetMatches[i].Aliases)}");
+                }
+                Console.WriteLine();
+            }
             foreach(var dotnetAlias in dotnetAliases)
             {
                 if(mdnAlias.Aliases.Intersect(dotnetAlias.Aliases).Any())
